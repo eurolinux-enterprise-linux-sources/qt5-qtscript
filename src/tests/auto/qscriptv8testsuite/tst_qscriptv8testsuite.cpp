@@ -179,8 +179,9 @@ tst_QScriptV8TestSuite::tst_QScriptV8TestSuite()
                         ":/tests", ":/")
 {
     // One test function per test file.
-    const QFileInfoList testFileInfos = testsDir.entryInfoList(QStringList() << "*.js", QDir::Files);
-    for (const QFileInfo &tfi : testFileInfos) {
+    QFileInfoList testFileInfos;
+    testFileInfos = testsDir.entryInfoList(QStringList() << "*.js", QDir::Files);
+    foreach (QFileInfo tfi, testFileInfos) {
         QString name = tfi.baseName();
         addTestFunction(name);
         testNames.append(name);

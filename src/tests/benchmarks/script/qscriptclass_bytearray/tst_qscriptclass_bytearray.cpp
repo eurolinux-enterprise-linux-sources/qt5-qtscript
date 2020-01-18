@@ -74,8 +74,8 @@ tst_QScriptClass_ByteArray::tst_QScriptClass_ByteArray()
 void tst_QScriptClass_ByteArray::benchmark_data()
 {
     QTest::addColumn<QString>("testName");
-    const QFileInfoList testFileInfos = testsDir.entryInfoList(QStringList() << "*.js", QDir::Files);
-    for (const QFileInfo &tfi : testFileInfos) {
+    QFileInfoList testFileInfos = testsDir.entryInfoList(QStringList() << "*.js", QDir::Files);
+    foreach (QFileInfo tfi, testFileInfos) {
         QString name = tfi.baseName();
         QTest::newRow(name.toLatin1().constData()) << name;
     }
