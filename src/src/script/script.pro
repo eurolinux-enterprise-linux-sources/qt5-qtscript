@@ -17,7 +17,7 @@ include($$WEBKITDIR/WebKit.pri)
 
 # Disable a few warnings on Windows.
 # These are in addition to the ones disabled in WebKit.pri
-win32-msvc*: QMAKE_CXXFLAGS += -wd4396 -wd4099 -wd4577
+win32-msvc*: QMAKE_CXXFLAGS += -wd4396 -wd4099
 
 # Windows CE-specific stuff copied from WebCore.pro
 # ### Should rather be in JavaScriptCore.pri?
@@ -41,8 +41,26 @@ DEFINES += LOG_DISABLED=1
 
 include($$WEBKITDIR/JavaScriptCore/JavaScriptCore.pri)
 
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/parser
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/bytecompiler
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/debugger
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/runtime
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/wtf
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/unicode
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/interpreter
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/jit
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/profiler
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/wrec
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/API
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/bytecode
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/assembler
+INCLUDEPATH += $$WEBKITDIR/JavaScriptCore/generated
+
 # This line copied from WebCore.pro
 DEFINES += WTF_USE_JAVASCRIPTCORE_BINDINGS=1 WTF_CHANGES=1
+
+CONFIG(release, debug|release):DEFINES += NDEBUG
 
 # Avoid JSC C API functions being exported.
 DEFINES += JS_NO_EXPORT
@@ -58,6 +76,3 @@ integrity {
 TR_EXCLUDE = $$WEBKITDIR/*
 
 load(qt_module)
-# Override the module default, as it breaks compilation with libc++>=5.0:
-# auto_ptr is no longer part of the c++1z standard.
-CONFIG -= c++1z

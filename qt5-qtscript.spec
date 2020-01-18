@@ -3,23 +3,26 @@
 
 %define docs 1
 
+#define prerelease
+
 Summary: Qt5 - QtScript component
 Name:    qt5-%{qt_module}
-Version: 5.9.7
-Release: 1%{?dist}
+Version: 5.6.1
+Release: 10%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
-Source0: http://download.qt.io/official_releases/qt/5.9/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+Source0: http://download.qt.io/snapshots/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 
 # add s390(x0 support to Platform.h (taken from webkit)
 Patch0: qtscript-opensource-src-5.5.0-s390.patch
 
+BuildRequires: cmake
 BuildRequires: qt5-qtbase-devel >= %{version}
+BuildRequires: qt5-qtbase-private-devel
 BuildRequires: pkgconfig(Qt5UiTools)
 
-BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 
 %description
@@ -52,26 +55,29 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %prep
-%setup -q -n %{qt_module}-opensource-src-%{version}
+%setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 
 %patch0 -p1 -b .s390
 
 
 %build
-%{qmake_qt5}
+mkdir %{_target_platform}
+pushd %{_target_platform}
+%{qmake_qt5} ..
 
 make %{?_smp_mflags}
 
 %if 0%{?docs}
 make %{?_smp_mflags} docs
 %endif
+popd
 
 
 %install
-make install INSTALL_ROOT=%{buildroot}
+make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 
 %if 0%{?docs}
-make install_docs INSTALL_ROOT=%{buildroot}
+make install_docs INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 %endif
 
 ## .prl file love (maybe consider just deleting these -- rex
@@ -90,7 +96,7 @@ rm -fv %{buildroot}%{_qt5_libdir}/lib*.la
 %postun -p /sbin/ldconfig
 
 %files
-%license LICENSE.FDL LICENSE.GPL* LICENSE.LGPL*
+%license LGPL_EXCEPTION.txt LICENSE.LGPL*
 %{_qt5_libdir}/libQt5Script.so.5*
 %{_qt5_libdir}/libQt5ScriptTools.so.5*
 
@@ -122,22 +128,6 @@ rm -fv %{buildroot}%{_qt5_libdir}/lib*.la
 
 
 %changelog
-* Thu Feb 07 2019 Jan Grulich <jgrulich@redhat.com> - 5.9.7-1
-- Update to 5.9.7
-  Resolves: bz#1564012
-
-* Fri Oct 06 2017 Jan Grulich <jgrulich@redhat.com> - 5.9.2-1
-- Update to 5.9.2
-  Resolves: bz#1482786
-
-* Mon Aug 28 2017 Jan Grulich <jgrulich@redhat.com> - 5.9.1-1
-- Update to 5.9.1
-  Resolves: bz#1482786
-
-* Wed Jan 11 2017 Jan Grulich <jgrulich@redhat.com> - 5.6.2-1
-- Update to 5.6.2
-  Resolves: bz#1384825
-
 * Tue Aug 30 2016 Jan Grulich <jgrulich@redhat.com> - 5.6.1-10
 - Increase build version to have newer version than in EPEL
   Resolves: bz#1317409
